@@ -16,11 +16,12 @@ export type LocalGuardian = {
 
 export type UserName = {
   firstName: string;
-  middleName: string;
+  middleName?: string;
   lastName: string;
 };
 
 export type Student = {
+  id: string;
   name: UserName;
   gender: 'male' | 'female';
   dateOfBirth: string;
@@ -33,5 +34,5 @@ export type Student = {
   guardian: Guardian;
   localGuardian: LocalGuardian;
   profileImg?: string;
-  isActive: 'active' | 'inactive';
+  isActive: 'active' | 'blocked';
 };
