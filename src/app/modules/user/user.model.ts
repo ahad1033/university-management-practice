@@ -1,3 +1,5 @@
+import bcrypt from 'bcrypt';
+import config from '../../config';
 import { model, Schema } from 'mongoose';
 import { TUser } from './user.interface';
 
@@ -22,7 +24,7 @@ const userSchema = new Schema<TUser>(
     status: {
       type: String,
       enum: ['in-progress', 'blocked'],
-      default: 'in-progress'
+      default: 'in-progress',
     },
     isDeleted: {
       type: Boolean,
@@ -33,5 +35,23 @@ const userSchema = new Schema<TUser>(
     timestamps: true,
   },
 );
+
+// PRE SAVE MIDDLEWARE/ HOOK
+userSchema.pre('save', async function (next) {
+  const user = this;
+
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_round),
+  );
+  next();
+});
+
+// POST SAVE MIDDLEWARE/ HOOK
+userSchema.post('save', function (doc, next) {
+  doc.password = '';
+
+  next();
+});
 
 export const User = model<TUser>('User', userSchema);

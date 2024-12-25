@@ -8,9 +8,6 @@ import {
   // StudentMethods,
 } from './student.interface';
 
-import bcrypt from 'bcrypt';
-import config from '../../config';
-
 const userNameSchema = new Schema<TUserName>({
   firstName: { type: String, required: true },
   middleName: { type: String },
@@ -42,7 +39,6 @@ const studentSchema = new Schema<TStudent>(
       unique: true,
       ref: 'User',
     },
-    password: { type: String, required: true },
     name: {
       type: userNameSchema,
       required: true,
@@ -86,24 +82,6 @@ const studentSchema = new Schema<TStudent>(
 // VIRTUAL
 studentSchema.virtual('fullName').get(function () {
   return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
-});
-
-// PRE SAVE MIDDLEWARE/ HOOK
-studentSchema.pre('save', async function (next) {
-  const user = this;
-
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_round),
-  );
-  next();
-});
-
-// POST SAVE MIDDLEWARE/ HOOK
-studentSchema.post('save', function (doc, next) {
-  doc.password = '';
-
-  next();
 });
 
 // QUERY MIDDLEWARE

@@ -1,7 +1,14 @@
-import { Request, Response } from 'express';
-import { UserServices } from './user.service';
+import { NextFunction, Request, Response } from 'express';
+import { HttpStatus } from 'http-status-ts';
 
-const createStudent = async (req: Request, res: Response) => {
+import { UserServices } from './user.service';
+import sendResponse from '../../utils/sendResponse';
+
+const createStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { password, student: studentData } = req.body;
 
@@ -12,13 +19,14 @@ const createStudent = async (req: Request, res: Response) => {
       studentData,
     );
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: HttpStatus.OK,
       success: true,
       message: 'Student is created successfully',
       data: result,
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
