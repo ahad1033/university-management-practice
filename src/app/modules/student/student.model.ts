@@ -6,10 +6,10 @@ import {
   // StudentModel,
   TLocalGuardian,
   // StudentMethods,
-} from './student/student.interface';
+} from './student.interface';
 
 import bcrypt from 'bcrypt';
-import config from '../config';
+import config from '../../config';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: { type: String, required: true },
@@ -33,46 +33,59 @@ const localGurandianSchema = new Schema<TLocalGuardian>({
   address: { type: String, required: true },
 });
 
-const studentSchema = new Schema<TStudent>({
-  id: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  name: {
-    type: userNameSchema,
-    required: true,
+const studentSchema = new Schema<TStudent>(
+  {
+    id: { type: String, required: true, unique: true },
+    user: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      unique: true,
+      ref: 'User',
+    },
+    password: { type: String, required: true },
+    name: {
+      type: userNameSchema,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'others'],
+      required: true,
+    },
+    dateOfBirth: { type: String, required: true },
+    email: { type: String, required: true },
+    contactNumber: { type: String, required: true },
+    emergencyContactNo: { type: String, required: true },
+    bloodGroup: {
+      type: String,
+      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+    },
+    presentAddress: { type: String, required: true },
+    permanentAddress: { type: String, required: true },
+    guardian: {
+      type: guardianSchema,
+      required: true,
+    },
+    localGuardian: {
+      type: localGurandianSchema,
+      required: true,
+    },
+    profileImg: { type: String },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
-  gender: {
-    type: String,
-    enum: ['male', 'female', 'others'],
-    required: true,
+  {
+    toJSON: {
+      virtuals: true,
+    },
   },
-  dateOfBirth: { type: String, required: true },
-  email: { type: String, required: true },
-  contactNumber: { type: String, required: true },
-  emergencyContactNo: { type: String, required: true },
-  bloodGroup: {
-    type: String,
-    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-  },
-  presentAddress: { type: String, required: true },
-  permanentAddress: { type: String, required: true },
-  guardian: {
-    type: guardianSchema,
-    required: true,
-  },
-  localGuardian: {
-    type: localGurandianSchema,
-    required: true,
-  },
-  profileImg: { type: String },
-  isActive: {
-    type: String,
-    enum: ['active', 'blocked'],
-    default: 'active',
-  },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
+);
+
+// VIRTUAL
+studentSchema.virtual('fullName').get(function () {
+  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
 });
 
 // PRE SAVE MIDDLEWARE/ HOOK
