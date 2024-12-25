@@ -45,10 +45,10 @@ const getSingleStudent = async (req: Request, res: Response) => {
       message: 'Student is retrived successfully',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       success: true,
-      message: 'Something went wrong',
+      message: error.message || 'Something went wrong',
       error: error,
     });
   }

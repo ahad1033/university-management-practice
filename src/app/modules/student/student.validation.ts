@@ -29,6 +29,7 @@ const localGuardianValidationSchema = z.object({
 
 const studentValidationSchema = z.object({
   id: z.string().nonempty('Student ID is required.'),
+  password: z.string().nonempty('Password is required.').min(6).max(20),
   name: userNameSchema,
   gender: z.enum(['male', 'female', 'others'], {
     errorMap: () => ({
