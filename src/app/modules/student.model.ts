@@ -69,6 +69,10 @@ const studentSchema = new Schema<TStudent>({
     enum: ['active', 'blocked'],
     default: 'active',
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // PRE SAVE MIDDLEWARE/ HOOK
@@ -79,6 +83,20 @@ studentSchema.pre('save', async function (next) {
     user.password,
     Number(config.bcrypt_salt_round),
   );
+  next();
+});
+
+// POST SAVE MIDDLEWARE/ HOOK
+studentSchema.post('save', function (doc, next) {
+  doc.password = '';
+
+  next();
+});
+
+// QUERY MIDDLEWARE
+studentSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+
   next();
 });
 
